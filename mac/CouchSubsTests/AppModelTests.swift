@@ -214,6 +214,23 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(AppModel(services: FakeServices(), store: store, defaults: defaults).step, .done)
     }
 
+    /// "İkinci hesap yok mu?": PSN girişi ve PS5 olmadan kurulum biter; görüntü Remote Play penceresinden, altyazı
+    /// bilgisayar ekranında. Yeniden açılınca sihirbaz çıkmaz.
+    func testNoSecondAccountReadsRemotePlayWindowAndCompletesSetup() {
+        let store = MemoryStore()
+        let defaults = UserDefaults.isolated()
+        let model = AppModel(services: FakeServices(), store: store, defaults: defaults)
+        model.advance()
+        XCTAssertEqual(model.step, .secondAccount)
+        model.useRemotePlayWindow()
+        XCTAssertEqual(model.step, .done)
+        XCTAssertEqual(model.settings.frameSource, .remotePlayWindow)
+        XCTAssertEqual(model.settings.output, .computer)
+        XCTAssertNil(model.accountId)
+        XCTAssertTrue(model.canStart)
+        XCTAssertEqual(AppModel(services: FakeServices(), store: store, defaults: defaults).step, .done)
+    }
+
     /// "TV'm yok, bilgisayar ekranında göster" de kurulumu bitirir.
     func testComputerScreenChoiceCompletesSetup() {
         let store = MemoryStore()

@@ -12192,6 +12192,54 @@
           }
         }
       }
+    },
+    "No second account? Read the Remote Play window": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No second account? Read the Remote Play window"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İkinci hesap yok mu? Remote Play penceresinden oku"
+          }
+        }
+      }
+    },
+    "CouchSubs reads the subtitles from PS Remote Play or chiaki-ng on this Mac. No second account or PS5 pairing is needed. You can connect a TV later.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CouchSubs reads the subtitles from PS Remote Play or chiaki-ng on this Mac. No second account or PS5 pairing is needed. You can connect a TV later."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CouchSubs altyazıyı bu Mac'teki PS Remote Play ya da chiaki-ng penceresinden okur. İkinci hesap ve PS5 eşleştirmesi gerekmez. TV'yi sonra da bağlayabilirsiniz."
+          }
+        }
+      }
+    },
+    "CouchSubs reads the subtitles from PS Remote Play or chiaki-ng on this PC. No second account or PS5 pairing is needed. You can connect a TV later.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CouchSubs reads the subtitles from PS Remote Play or chiaki-ng on this PC. No second account or PS5 pairing is needed. You can connect a TV later."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CouchSubs altyazıyı bu bilgisayardaki PS Remote Play ya da chiaki-ng penceresinden okur. İkinci hesap ve PS5 eşleştirmesi gerekmez. TV'yi sonra da bağlayabilirsiniz."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -458,6 +458,17 @@ public sealed class AppController : INotifyPropertyChanged, IDisposable
         Advance();
     }
 
+    /// <summary>
+    /// Sihirbazdaki "İkinci hesap yok mu?": görüntü bu bilgisayardaki Remote Play penceresinden okunur. PSN girişi, PS5
+    /// eşleştirmesi ve TV adımı atlanır, kurulum biter; TV eşleşmemişse altyazı bilgisayar ekranında gösterilir (TV ve
+    /// daha iyi çeviri sonra Ayarlar'dan).
+    /// </summary>
+    public void UseRemotePlayWindow()
+    {
+        Settings = settings with { FrameSource = FrameSource.RemotePlayWindow, Output = HasTv ? settings.Output : SubtitleOutput.Computer };
+        Step = OnboardingStep.Done;
+    }
+
     public async Task PairAsync(LgTv target)
     {
         await StartServerAsync();

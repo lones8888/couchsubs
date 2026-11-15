@@ -827,6 +827,25 @@ public class AppControllerRunTests
 
     /// Remote Play penceresinden okurken PS5 kaydı gerekmez: sihirbaz açılmaz, kurulum kaydı değişmez, çeviri pencere
     /// kaynağıyla (PS5'e bağlanmadan) başlar.
+    /// "İkinci hesap yok mu?": PSN girişi ve PS5 olmadan kurulum biter; görüntü Remote Play penceresinden, altyazı
+    /// bilgisayar ekranında. Yeniden açılınca sihirbaz çıkmaz.
+    [Fact]
+    public void NoSecondAccountReadsRemotePlayWindowAndCompletesSetup()
+    {
+        var store = new MemoryStore();
+        var settings = new MemorySettings();
+        var controller = AppControllerTests.Make(store: store, settings: settings);
+        controller.Advance();
+        Assert.Equal(OnboardingStep.SecondAccount, controller.Step);
+        controller.UseRemotePlayWindow();
+        Assert.Equal(OnboardingStep.Done, controller.Step);
+        Assert.Equal(FrameSource.RemotePlayWindow, controller.Settings.FrameSource);
+        Assert.Equal(SubtitleOutput.Computer, controller.Settings.Output);
+        Assert.False(controller.HasAccount);
+        Assert.True(controller.CanStart);
+        Assert.Equal(OnboardingStep.Done, AppControllerTests.Make(store: store, settings: settings).Step);
+    }
+
     [Fact]
     public async Task WindowSourceStartsWithoutPairedPs5()
     {

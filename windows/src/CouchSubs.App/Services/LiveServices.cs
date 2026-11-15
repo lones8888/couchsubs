@@ -108,6 +108,7 @@ public sealed class LiveServices : IAppServices
         new StreamSession(console, accountId, loginPasscode);
 
     public IStreamSession MakeWindowStream(RemotePlayApp app) => new RemotePlayWindowStream(app);
+    public bool RemotePlayInstalled(RemotePlayApp app) => RemotePlayWindowStream.IsInstalled(app);
 
     public IKeeper MakeKeeper(LgTv tv, string? key, IReadOnlyDictionary<string, string> parameters, Func<bool> appConnected, Action<LgTv> onMoved,
                               Action<string> onKey)

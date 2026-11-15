@@ -455,8 +455,24 @@
                             </StackPanel>
                             <TextBlock x:Name="WindowSourceHint" Style="{StaticResource HintText}" TextWrapping="Wrap" Margin="0,12,0,0"
                                        Text="{t:T 'Play in PS Remote Play or chiaki-ng on this PC; CouchSubs reads only that window, so no second account is needed. Show the subtitles on the computer screen.'}" />
+                            <!-- Kurulu olanlar "Kurulu", olmayanlar resmi indirme sayfasına giden düğmeyle (ikisi de denenebilir). -->
+                            <Grid x:Name="SonyInstallRow" Margin="0,12,0,0">
+                                <TextBlock Text="{t:T 'PS Remote Play (Sony)'}" VerticalAlignment="Center" />
+                                <TextBlock x:Name="SonyInstalledText" Style="{StaticResource HintText}" Text="{t:T 'Installed'}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                <Button x:Name="SonyDownloadButton" Content="{t:T 'Download PS Remote Play'}" HorizontalAlignment="Right" Click="OnDownloadSony" />
+                            </Grid>
+                            <Grid x:Name="ChiakiInstallRow" Margin="0,8,0,0">
+                                <TextBlock Text="{t:T 'chiaki-ng'}" VerticalAlignment="Center" />
+                                <TextBlock x:Name="ChiakiInstalledText" Style="{StaticResource HintText}" Text="{t:T 'Installed'}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                <Button x:Name="ChiakiDownloadButton" Content="{t:T 'Download chiaki-ng'}" HorizontalAlignment="Right" Click="OnDownloadChiaki" />
+                            </Grid>
                             <TextBlock x:Name="Ps5SourceHint" Style="{StaticResource HintText}" TextWrapping="Wrap" Margin="0,12,0,0"
                                        Text="{t:T 'CouchSubs connects to the PS5 with the second account. Sony\'s PS Remote Play can\'t be used at the same time.'}" />
+                            <!-- PS5 seçili ama ikinci hesap ya da PS5 eşleşmesi yok: sihirbazı ikinci hesap adımından açar. -->
+                            <Grid x:Name="Ps5LinkPanel" Margin="0,12,0,0">
+                                <TextBlock Text="{t:T 'The PS5 is not linked yet. Sign in with the second account and pair the PS5.'}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,170,0" />
+                                <Button Content="{t:T 'Link account'}" HorizontalAlignment="Right" VerticalAlignment="Center" Click="OnLinkPs5" />
+                            </Grid>
                         </StackPanel>
                     </c:Card>
                 </StackPanel>

@@ -254,6 +254,25 @@ public sealed class RemotePlayWindowStream : IStreamSession
     private void OpenIfNeeded()
     {
         if (processNames.Any(name => Process.GetProcessesByName(name).Length > 0)) return;
+        var path = InstalledPath(app);
+        if (path is null) return;
+        try
+        {
+            RemotePlayLog.Note($"{Path.GetFileNameWithoutExtension(path)} açılıyor");
+            Process.Start(new ProcessStartInfo(path) { UseShellExecute = true, WorkingDirectory = Path.GetDirectoryName(path) })?.Dispose();
+        }
+        catch (Exception error)
+        {
+            RemotePlayLog.Note($"Remote Play açılamadı: {error.Message}");
+        }
+    }
+
+    /// <summary>Seçilen Remote Play uygulaması bu bilgisayarda kurulu mu ("hangisi açıksa"da ikisinden biri yeter).</summary>
+    public static bool IsInstalled(RemotePlayApp app) => InstalledPath(app) is not null;
+
+    /// <summary>Seçilen uygulamanın kurulu yolu ("hangisi açıksa"da Sony önce); kurulu değilse null.</summary>
+    internal static string? InstalledPath(RemotePlayApp app)
+    {
         var candidates = new List<string>();
         var x86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
         var x64 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
@@ -271,17 +290,7 @@ public sealed class RemotePlayWindowStream : IStreamSession
                 candidates.Add(Path.Combine(root, "chiaki-ng", "chiaki-ng.exe"));
             }
         }
-        var path = candidates.FirstOrDefault(File.Exists);
-        if (path is null) return;
-        try
-        {
-            RemotePlayLog.Note($"{Path.GetFileNameWithoutExtension(path)} açılıyor");
-            Process.Start(new ProcessStartInfo(path) { UseShellExecute = true, WorkingDirectory = Path.GetDirectoryName(path) })?.Dispose();
-        }
-        catch (Exception error)
-        {
-            RemotePlayLog.Note($"Remote Play açılamadı: {error.Message}");
-        }
+        return candidates.FirstOrDefault(File.Exists);
     }
 
     /// <summary>Bir pencerenin yakalanması: Direct3D aygıtı, kare havuzu ve oturum. Kareler saniyede en çok

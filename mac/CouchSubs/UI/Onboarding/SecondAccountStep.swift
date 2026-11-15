@@ -23,6 +23,13 @@ struct SecondAccountStep: View {
                             .buttonStyle(.secondary)
                     }
                     HintText(text: "CouchSubs reads the subtitles from PS Remote Play or chiaki-ng on this Mac. No second account or PS5 pairing is needed. You can connect a TV later.")
+                    if !model.remotePlayInstalled(.automatic) {
+                        Text("PS Remote Play and chiaki-ng aren't installed on this Mac.").foregroundStyle(Color.csSecondary)
+                        HStack {
+                            Button("Download PS Remote Play") { model.openDownload(for: .sony) }.buttonStyle(.secondary)
+                            Button("Download chiaki-ng") { model.openDownload(for: .chiaki) }.buttonStyle(.secondary)
+                        }
+                    }
                 }
             }
         }

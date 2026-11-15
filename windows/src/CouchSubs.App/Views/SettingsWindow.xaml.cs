@@ -107,6 +107,25 @@ public partial class SettingsWindow : Window
         RemotePlayAppPanel.Visibility = window ? Visibility.Visible : Visibility.Collapsed;
         WindowSourceHint.Visibility = window ? Visibility.Visible : Visibility.Collapsed;
         Ps5SourceHint.Visibility = window ? Visibility.Collapsed : Visibility.Visible;
+        SonyInstallRow.Visibility = ChiakiInstallRow.Visibility = window ? Visibility.Visible : Visibility.Collapsed;
+        var sony = controller.RemotePlayInstalled(RemotePlayApp.Sony);
+        var chiaki = controller.RemotePlayInstalled(RemotePlayApp.Chiaki);
+        SonyInstalledText.Visibility = sony ? Visibility.Visible : Visibility.Collapsed;
+        SonyDownloadButton.Visibility = sony ? Visibility.Collapsed : Visibility.Visible;
+        ChiakiInstalledText.Visibility = chiaki ? Visibility.Visible : Visibility.Collapsed;
+        ChiakiDownloadButton.Visibility = chiaki ? Visibility.Collapsed : Visibility.Visible;
+        Ps5LinkPanel.Visibility = controller.NeedsPs5Link ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void OnDownloadSony(object sender, RoutedEventArgs e) => OpenUrl(AppController.SonyRemotePlayDownload);
+    private void OnDownloadChiaki(object sender, RoutedEventArgs e) => OpenUrl(AppController.ChiakiDownload);
+    private static void OpenUrl(string url) => Process.Start(new ProcessStartInfo(url) { UseShellExecute = true })?.Dispose();
+
+    /// <summary>"Hesabı bağla": sihirbaz ikinci hesap adımından açılır; ayar penceresi kapanır, sihirbaz ana pencerede görünür.</summary>
+    private void OnLinkPs5(object sender, RoutedEventArgs e)
+    {
+        controller.LinkPs5Account();
+        Close();
     }
 
     private void OnFrameSource(object sender, SelectionChangedEventArgs e)

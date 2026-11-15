@@ -828,8 +828,6 @@ public class AppControllerRunTests
         controller.Dispose();
     }
 
-    /// Remote Play penceresinden okurken PS5 kaydı gerekmez: sihirbaz açılmaz, kurulum kaydı değişmez, çeviri pencere
-    /// kaynağıyla (PS5'e bağlanmadan) başlar.
     /// "İkinci hesap yok mu?": PSN girişi ve PS5 olmadan kurulum biter; görüntü Remote Play penceresinden, altyazı
     /// bilgisayar ekranında. Yeniden açılınca sihirbaz çıkmaz.
     [Fact]
@@ -880,6 +878,8 @@ public class AppControllerRunTests
         Assert.Equal("Reads the Remote Play window on this PC when you start translating.", controller.Ps5StatusText);
     }
 
+    /// Remote Play penceresinden okurken PS5 kaydı gerekmez: sihirbaz açılmaz, kurulum kaydı değişmez, çeviri pencere
+    /// kaynağıyla (PS5'e bağlanmadan) başlar.
     [Fact]
     public async Task WindowSourceStartsWithoutPairedPs5()
     {

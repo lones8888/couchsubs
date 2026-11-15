@@ -81,6 +81,19 @@ public enum SubtitleOutput: String, Codable, CaseIterable {
     public var showsOnComputer: Bool { self != .tv }
 }
 
+/// Görüntünün nereden okunduğu. `ps5`: CouchSubs PS5'e kendisi bağlanır (ikinci hesap). `remotePlayWindow`: oyun bu
+/// bilgisayardaki Sony PS Remote Play uygulamasında oynanır, CouchSubs yalnız onun penceresini okur; PS5'e ikinci oturum
+/// açılmadığı için ikinci hesap gerekmez. Eski kayıtlar `ps5` ile açılır.
+public enum FrameSource: String, Codable, CaseIterable {
+    case ps5, remotePlayWindow
+}
+
+/// Görüntü pencereden okunurken hangi Remote Play uygulamasının penceresi: hangisi açıksa (Sony'nin PS Remote Play'i ya
+/// da açık kaynak chiaki-ng), yalnız Sony'ninki ya da yalnız chiaki-ng'ninki. Eski kayıtlar "hangisi açıksa" ile açılır.
+public enum RemotePlayApp: String, Codable, CaseIterable {
+    case automatic, sony, chiaki
+}
+
 /// Uygulama pencerelerinin görünümü (Windows'taki `AppAppearance` ile aynı). Onaylı tasarım koyudur; varsayılan da odur.
 public enum AppAppearance: String, Codable, CaseIterable {
     case dark, light, system
@@ -120,6 +133,10 @@ public struct UserSettings: Codable, Equatable {
     public var sharePool = LinePool.enabledByDefault
     /// Koyu, açık ya da sistemle aynı. Eski kayıtlarda yoktur; onlar da koyu açılır.
     public var appearance = AppAppearance.dark
+    /// Görüntü PS5 bağlantısından mı, bu bilgisayardaki PS Remote Play penceresinden mi okunur.
+    public var frameSource = FrameSource.ps5
+    /// Pencereden okunurken hangi Remote Play uygulaması (bkz. `RemotePlayApp`).
+    public var remotePlayApp = RemotePlayApp.automatic
 
     public init() {}
 
@@ -148,6 +165,8 @@ public struct UserSettings: Codable, Equatable {
         gamePacks = try values.decodeIfPresent(Bool.self, forKey: .gamePacks) ?? defaults.gamePacks
         sharePool = try values.decodeIfPresent(Bool.self, forKey: .sharePool) ?? defaults.sharePool
         appearance = (try? values.decodeIfPresent(AppAppearance.self, forKey: .appearance)) ?? defaults.appearance
+        frameSource = (try? values.decodeIfPresent(FrameSource.self, forKey: .frameSource)) ?? defaults.frameSource
+        remotePlayApp = (try? values.decodeIfPresent(RemotePlayApp.self, forKey: .remotePlayApp)) ?? defaults.remotePlayApp
     }
 
     /// Hazır bölge seçilir; Özel seçilince kayıtlı bölge olduğu gibi kalır.

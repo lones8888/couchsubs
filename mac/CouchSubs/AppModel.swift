@@ -880,6 +880,15 @@ final class AppModel: ObservableObject {
         advance()
     }
 
+    /// Sihirbazdaki "İkinci hesap yok mu?": görüntü bu Mac'teki PS Remote Play penceresinden okunur. PSN girişi, PS5
+    /// eşleştirmesi ve TV adımı atlanır, kurulum biter; TV eşleşmemişse altyazı bilgisayar ekranında gösterilir (TV ve
+    /// daha iyi çeviri sonra Ayarlar'dan).
+    func useRemotePlayWindow() {
+        settings.frameSource = .remotePlayWindow
+        if !hasTV { settings.output = .computer }
+        step = .done
+    }
+
     func pair(_ tv: LGTV) async throws {
         try await startServer()
         let savedKey = store.load(String.self, for: StoreKey.tvKey)

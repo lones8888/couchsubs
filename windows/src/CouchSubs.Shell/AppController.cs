@@ -171,7 +171,7 @@ public sealed class AppController : INotifyPropertyChanged, IDisposable
     public bool IsStarting { get => isStarting; private set => Set(ref isStarting, value); }
     public SessionState SessionState { get => sessionState; private set => Set(ref sessionState, value, [nameof(Ps5StatusText), nameof(Ps5Tone)]); }
     public string Ps5StatusText => settings.FrameSource == FrameSource.RemotePlayWindow
-        ? WindowStatusText(sessionState, isRunning, text)
+        ? WindowStatusText(sessionState, isRunning, text, installed: !RemotePlayMissing)
         : StatusText(sessionState, isRunning, text, console is null ? null : string.IsNullOrEmpty(console.Name) ? "PS5" : console.Name);
     public StatusTone Ps5Tone => Ps5ToneFor(sessionState, isRunning);
     public int TvClients { get => tvClients; private set => Set(ref tvClients, value, [nameof(TvTone), nameof(TvStatusText)]); }
@@ -459,6 +459,22 @@ public sealed class AppController : INotifyPropertyChanged, IDisposable
         Settings = settings with { FrameSource = FrameSource.RemotePlayWindow, Output = HasTv ? settings.Output : SubtitleOutput.Computer };
         Step = OnboardingStep.Done;
     }
+
+    /// <summary>Görüntü PS5'ten (ikinci hesap) alınacak ama hesap ya da PS5 eşleşmesi yok: Ayarlar'da "Hesabı bağla" görünür.</summary>
+    public bool NeedsPs5Link => settings.FrameSource == FrameSource.Ps5 && (accountId is null || console is null);
+
+    /// <summary>Ayarlar › Görüntü kaynağı › "Hesabı bağla": sihirbaz ikinci hesap adımından açılır (PSN girişi, PS5 eşleştirmesi).</summary>
+    public void LinkPs5Account() => Step = OnboardingStep.SecondAccount;
+
+    /// <summary>Seçilen Remote Play uygulaması bu bilgisayarda kurulu mu (Ayarlar'daki "Kurulu" / "İndir" satırları).</summary>
+    public bool RemotePlayInstalled(RemotePlayApp app) => services.RemotePlayInstalled(app);
+
+    /// <summary>Görüntü Remote Play penceresinden okunacak ama seçilen uygulama kurulu değil: ana ekran nereden indirileceğini söyler.</summary>
+    public bool RemotePlayMissing => settings.FrameSource == FrameSource.RemotePlayWindow && !services.RemotePlayInstalled(settings.RemotePlayApp);
+
+    /// <summary>Resmi indirme sayfaları: Sony PS Remote Play ve chiaki-ng'nin son sürümü.</summary>
+    public const string SonyRemotePlayDownload = "https://remoteplay.dl.playstation.net/remoteplay/";
+    public const string ChiakiDownload = "https://github.com/chiaki-ng/chiaki-ng/releases/latest";
 
     public async Task PairAsync(LgTv target)
     {
@@ -1255,9 +1271,11 @@ public sealed class AppController : INotifyPropertyChanged, IDisposable
     /// <param name="pairedName">Eşleşmiş PS5'in adı. Çeviri başlamamışken eşleşmiş PS5 için "Bağlı değil" yerine "eşleşti,
     /// başlatınca bağlanır" denir: eskiden eşleştirme başarılı olsa da ana ekran "Bağlı değil" diyordu.</param>
     /// <summary>Görüntü bu bilgisayardaki Remote Play penceresinden okunurken durumun metni.</summary>
-    public static string WindowStatusText(SessionState state, bool running, Localizer text)
+    public static string WindowStatusText(SessionState state, bool running, Localizer text, bool installed = true)
     {
         const string waiting = "Waiting for the Remote Play window. Open PS Remote Play or chiaki-ng on this PC.";
+        if (state.Phase != SessionPhase.Streaming && !installed)
+            return text["The Remote Play app isn't installed on this PC. Download it in Settings › Picture source."];
         switch (state.Phase)
         {
             case SessionPhase.Streaming: return text["Reading the Remote Play window"];

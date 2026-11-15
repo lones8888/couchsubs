@@ -26,6 +26,15 @@ final class RemotePlayWindowStream: NSObject, StreamControlling, SCStreamOutput,
         case .chiaki: [chiakiBundleIdentifier]
         }
     }
+
+    /// Seçilen Remote Play uygulaması bu Mac'te kurulu mu ("hangisi açıksa"da ikisinden biri yeter).
+    static func isInstalled(_ app: RemotePlayApp) -> Bool {
+        bundleIdentifiers(for: app).contains { NSWorkspace.shared.urlForApplication(withBundleIdentifier: $0) != nil }
+    }
+
+    /// Resmi indirme sayfaları: Sony PS Remote Play (Mac ve Windows sürümleri) ve chiaki-ng'nin son sürümü.
+    static let sonyDownloadURL = URL(string: "https://remoteplay.dl.playstation.net/remoteplay/")!
+    static let chiakiDownloadURL = URL(string: "https://github.com/chiaki-ng/chiaki-ng/releases/latest")!
     /// Saniyedeki kare. PS5 akışı 30 verir ama okuma zaten bir önceki kare bitmeden yenisini almaz (`FrameGate`);
     /// fazlası yalnız işlemciyi yorar ve aynı makinede çalışan Remote Play'i yavaşlatabilir.
     static let framesPerSecond: Int32 = 10

@@ -12048,6 +12048,150 @@
           }
         }
       }
+    },
+    "Link account": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Link account"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hesabı bağla"
+          }
+        }
+      }
+    },
+    "The PS5 is not linked yet. Sign in with the second account and pair the PS5.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The PS5 is not linked yet. Sign in with the second account and pair the PS5."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PS5 henüz bağlı değil. İkinci hesapla giriş yapıp PS5'i eşleştirin."
+          }
+        }
+      }
+    },
+    "Download PS Remote Play": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download PS Remote Play"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PS Remote Play'i indir"
+          }
+        }
+      }
+    },
+    "Download chiaki-ng": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download chiaki-ng"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "chiaki-ng'yi indir"
+          }
+        }
+      }
+    },
+    "Installed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installed"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kurulu"
+          }
+        }
+      }
+    },
+    "PS Remote Play and chiaki-ng aren't installed on this Mac.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PS Remote Play and chiaki-ng aren't installed on this Mac."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac'te PS Remote Play de chiaki-ng de kurulu değil."
+          }
+        }
+      }
+    },
+    "PS Remote Play and chiaki-ng aren't installed on this PC.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PS Remote Play and chiaki-ng aren't installed on this PC."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu bilgisayarda PS Remote Play de chiaki-ng de kurulu değil."
+          }
+        }
+      }
+    },
+    "The Remote Play app isn't installed on this Mac. Download it in Settings › Picture source.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Remote Play app isn't installed on this Mac. Download it in Settings › Picture source."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remote Play uygulaması bu Mac'te kurulu değil. Ayarlar › Görüntü kaynağı'ndan indirin."
+          }
+        }
+      }
+    },
+    "The Remote Play app isn't installed on this PC. Download it in Settings › Picture source.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Remote Play app isn't installed on this PC. Download it in Settings › Picture source."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remote Play uygulaması bu bilgisayarda kurulu değil. Ayarlar › Görüntü kaynağı'ndan indirin."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

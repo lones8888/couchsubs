@@ -20,6 +20,7 @@ extension AppServices {
     }
     /// Bu Mac'teki Remote Play penceresinden (PS Remote Play ya da chiaki-ng) okuyan görüntü kaynağı (bkz. `RemotePlayWindowStream`).
     func makeWindowStream(app: RemotePlayApp) -> StreamControlling { RemotePlayWindowStream(app: app) }
+    func remotePlayInstalled(_ app: RemotePlayApp) -> Bool { RemotePlayWindowStream.isInstalled(app) }
     /// PS5'te o an çalışan oyun: yalnız bağlı PS5'in adresine keşif sorusu gider (ortak havuz için; bkz. `RunningGame`).
     func runningGame(host: String) async -> RunningGame? {
         guard let info = await Console.discover(timeout: .seconds(2), host: host).first else { return nil }
@@ -42,6 +43,8 @@ protocol AppServices: AnyObject {
     func makeStream(console: RegisteredConsole, accountId: Data, loginPasscode: String?) -> StreamControlling
     /// Görüntüyü bu Mac'teki Remote Play penceresinden alan kaynak (`UserSettings.frameSource`, `remotePlayApp`).
     func makeWindowStream(app: RemotePlayApp) -> StreamControlling
+    /// Seçilen Remote Play uygulaması (PS Remote Play ya da chiaki-ng) bu Mac'te kurulu mu.
+    func remotePlayInstalled(_ app: RemotePlayApp) -> Bool
     /// `onMoved`: TV ağda yeni bir adreste bulununca çağrılır.
     /// `appConnected`: TV uygulaması bilgisayara bağlı mı (Samsung'da bağlıyken TV'ye dokunulmaz).
     /// `onKey`: TV bağlantıda yeni jeton verdi (Samsung); saklanır.
@@ -889,6 +892,23 @@ final class AppModel: ObservableObject {
         step = .done
     }
 
+    /// Görüntü PS5'ten (ikinci hesap) alınacak ama hesap ya da PS5 eşleşmesi yok: Ayarlar'da "Hesabı bağla" görünür.
+    var needsPS5Link: Bool { settings.frameSource == .ps5 && (accountId == nil || console == nil) }
+
+    /// Ayarlar › Görüntü kaynağı › "Hesabı bağla": sihirbaz ikinci hesap adımından açılır (PSN girişi, PS5 eşleştirmesi).
+    func linkPS5Account() { step = .secondAccount }
+
+    /// Seçilen Remote Play uygulaması bu Mac'te kurulu mu (Ayarlar'daki "Kurulu" / "İndir" satırları).
+    func remotePlayInstalled(_ app: RemotePlayApp) -> Bool { services.remotePlayInstalled(app) }
+
+    /// Görüntü Remote Play penceresinden okunacak ama seçilen uygulama kurulu değil: ana ekran nereden indirileceğini söyler.
+    var remotePlayMissing: Bool { settings.frameSource == .remotePlayWindow && !services.remotePlayInstalled(settings.remotePlayApp) }
+
+    /// "PS Remote Play'i indir" / "chiaki-ng'yi indir": resmi indirme sayfası tarayıcıda açılır.
+    func openDownload(for app: RemotePlayApp) {
+        NSWorkspace.shared.open(app == .chiaki ? RemotePlayWindowStream.chiakiDownloadURL : RemotePlayWindowStream.sonyDownloadURL)
+    }
+
     func pair(_ tv: LGTV) async throws {
         try await startServer()
         let savedKey = store.load(String.self, for: StoreKey.tvKey)
@@ -1653,12 +1673,16 @@ final class AppModel: ObservableObject {
 
     /// Ana ekrandaki PS5 durumu (eşleşmiş PS5'in adıyla).
     var ps5StatusText: String {
-        if settings.frameSource == .remotePlayWindow { return Self.windowStatusText(sessionState, running: isRunning) }
+        if settings.frameSource == .remotePlayWindow {
+            return Self.windowStatusText(sessionState, running: isRunning, installed: !remotePlayMissing)
+        }
         return Self.statusText(sessionState, running: isRunning, pairedName: console.map { $0.name.isEmpty ? "PS5" : $0.name })
     }
 
     /// Görüntü bu Mac'teki Remote Play penceresinden okunurken durumun metni.
-    static func windowStatusText(_ state: SessionState, running: Bool) -> String {
+    static func windowStatusText(_ state: SessionState, running: Bool, installed: Bool = true) -> String {
+        if case .streaming = state { return String(localized: "Reading the Remote Play window") }
+        if !installed { return String(localized: "The Remote Play app isn't installed on this Mac. Download it in Settings › Picture source.") }
         switch state {
         case .streaming: return String(localized: "Reading the Remote Play window")
         case .connecting: return String(localized: "Waiting for the Remote Play window. Open PS Remote Play or chiaki-ng on this Mac.")

@@ -387,6 +387,8 @@ public interface IAppServices
     IStreamSession MakeStream(RegisteredConsole console, byte[] accountId, string? loginPasscode);
     /// <summary>Görüntüyü bu bilgisayardaki Remote Play penceresinden (PS Remote Play ya da chiaki-ng) alan kaynak.</summary>
     IStreamSession MakeWindowStream(RemotePlayApp app) => throw new NotSupportedException();
+    /// <summary>Seçilen Remote Play uygulaması (PS Remote Play ya da chiaki-ng) bu bilgisayarda kurulu mu.</summary>
+    bool RemotePlayInstalled(RemotePlayApp app) => true;
     /// <param name="appConnected">TV uygulaması bilgisayara bağlı mı (Samsung'da bağlıyken TV'ye dokunulmaz).</param>
     /// <param name="onMoved">TV ağda yeni bir adreste bulununca çağrılır.</param>
     /// <param name="onKey">TV bağlantıda yeni jeton verdi (Samsung); saklanır.</param>

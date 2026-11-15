@@ -18,6 +18,9 @@ extension UserDefaults {
 }
 
 final class FakeServices: AppServices {
+    /// PS Remote Play / chiaki-ng bu Mac'te kurulu mu (Ayarlar'daki indirme satırları, ana ekran uyarısı).
+    var remotePlayInstalledResult = true
+    func remotePlayInstalled(_ app: RemotePlayApp) -> Bool { remotePlayInstalledResult }
     var consoles = [ConsoleInfo(host: "192.168.1.253", name: "PS5-789", isAwake: true)]
     var tvs = [LGTV(name: "LG TV", host: "192.168.1.153")]
     var registered: RegisteredConsole?
@@ -229,6 +232,33 @@ final class AppModelTests: XCTestCase {
         XCTAssertNil(model.accountId)
         XCTAssertTrue(model.canStart)
         XCTAssertEqual(AppModel(services: FakeServices(), store: store, defaults: defaults).step, .done)
+    }
+
+    /// Pencere modunda kurulmuş, sonra Ayarlar'da PS5 seçilmiş: "Hesabı bağla" görünür, sihirbaz ikinci hesap adımından açılır.
+    func testLinkPS5AccountOpensWizardAtSecondAccount() {
+        let model = AppModel(services: FakeServices(), store: MemoryStore(), defaults: UserDefaults.isolated())
+        model.advance()
+        model.useRemotePlayWindow()
+        XCTAssertFalse(model.needsPS5Link)
+        model.settings.frameSource = .ps5
+        XCTAssertTrue(model.needsPS5Link)
+        XCTAssertFalse(model.canStart)
+        model.linkPS5Account()
+        XCTAssertEqual(model.step, .secondAccount)
+    }
+
+    /// Remote Play uygulaması kurulu değilse ana ekran bunu ve nereden indirileceğini söyler.
+    func testMissingRemotePlayAppIsReported() {
+        let services = FakeServices()
+        services.remotePlayInstalledResult = false
+        let model = AppModel(services: services, store: MemoryStore(), defaults: UserDefaults.isolated())
+        model.advance()
+        model.useRemotePlayWindow()
+        XCTAssertTrue(model.remotePlayMissing)
+        XCTAssertEqual(model.ps5StatusText, String(localized: "The Remote Play app isn't installed on this Mac. Download it in Settings › Picture source."))
+        services.remotePlayInstalledResult = true
+        XCTAssertFalse(model.remotePlayMissing)
+        XCTAssertEqual(model.ps5StatusText, String(localized: "Reads the Remote Play window on this Mac when you start translating."))
     }
 
     /// "TV'm yok, bilgisayar ekranında göster" de kurulumu bitirir.

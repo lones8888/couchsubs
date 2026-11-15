@@ -472,6 +472,7 @@ private struct LoginPasscodeCard: View {
 /// değiştirilirse yeni kaynakla yeniden başlar.
 private struct FrameSourceCard: View {
     @EnvironmentObject private var model: AppModel
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         Card {
@@ -486,8 +487,38 @@ private struct FrameSourceCard: View {
                     Text("chiaki-ng").tag(RemotePlayApp.chiaki)
                 }
                 HintText(text: "Play in PS Remote Play or chiaki-ng on this Mac; CouchSubs reads only that window, so no second account is needed. Show the subtitles on the computer screen, and allow Screen Recording for CouchSubs when macOS asks.")
+                // Kurulu olanlar "Kurulu", olmayanlar resmi indirme sayfasına giden düğmeyle (ikisi de denenebilir).
+                HStack {
+                    Text("PS Remote Play (Sony)")
+                    Spacer()
+                    if model.remotePlayInstalled(.sony) {
+                        Text("Installed").foregroundStyle(Color.csSecondary)
+                    } else {
+                        Button("Download PS Remote Play") { model.openDownload(for: .sony) }.buttonStyle(.secondary)
+                    }
+                }
+                HStack {
+                    Text("chiaki-ng")
+                    Spacer()
+                    if model.remotePlayInstalled(.chiaki) {
+                        Text("Installed").foregroundStyle(Color.csSecondary)
+                    } else {
+                        Button("Download chiaki-ng") { model.openDownload(for: .chiaki) }.buttonStyle(.secondary)
+                    }
+                }
             } else {
                 HintText(text: "CouchSubs connects to the PS5 with the second account. Sony's PS Remote Play can't be used at the same time.")
+                if model.needsPS5Link {
+                    HStack {
+                        Text("The PS5 is not linked yet. Sign in with the second account and pair the PS5.")
+                        Spacer()
+                        Button("Link account") {
+                            model.linkPS5Account()
+                            dismiss()
+                        }
+                        .buttonStyle(.secondary)
+                    }
+                }
             }
         }
     }

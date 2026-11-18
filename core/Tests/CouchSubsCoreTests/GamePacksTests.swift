@@ -169,7 +169,7 @@ final class GamePackTests: XCTestCase {
         let ids = all.packs.map(\.id)
         let elapsed = Date().timeIntervalSince(start)
         print("paket yükleme: \(Int(elapsed * 1000)) ms, \(all.packs.reduce(0) { $0 + $1.entries }) satır")
-        XCTAssertEqual(ids, ["assassins-creed-shadows", "call-of-duty-modern-warfare-2019", "death-stranding-2", "death-stranding-directors-cut", "elden-ring", "gta-v", "mafia-the-old-country", "marvels-spider-man-2", "red-dead-redemption-2"])
+        XCTAssertEqual(ids, ["assassins-creed-shadows", "call-of-duty-modern-warfare-2019", "death-stranding-2", "death-stranding-directors-cut", "elden-ring", "gta-6", "gta-v", "mafia-the-old-country", "marvels-spider-man-2", "red-dead-redemption-2"])
         XCTAssertTrue(all.packs.allSatisfy(\.builtIn))
         // Biçim 2 (parçalar ve imzalar) yüklemeyi Release'te ~%30 uzatıyor; Debug derlemede ve yüklü makinede daha yavaş.
         XCTAssertLessThan(elapsed, 30)

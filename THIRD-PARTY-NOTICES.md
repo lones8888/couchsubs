@@ -62,6 +62,12 @@ glossary of the Elden Ring Turkish fan translation by mehmetkrn
 ([elden-ring-turkce-yama](https://github.com/mehmetkrn/elden-ring-turkce-yama), MIT License, Copyright (c) mehmetkrn).
 ELDEN RING is a trademark of FromSoftware, Inc. and BANDAI NAMCO Entertainment Inc.
 
+The Grand Theft Auto VI pack (`gta-6.json.gz`) was built from English subtitles read with OCR (Apple Vision) from a
+YouTube gameplay video ("GTA 6 Gameplay Walkthrough Part 1 FULL GAME [4K ULTRA HD PS5 PRO] No Commentary", about the
+first 8 h 54 min of the stream). The first 1,943 lines were translated with Codex (OpenAI), the other 5,152 with
+Gemma 4 26B-A4B (`google/gemma-4-26B-A4B-it-qat-q4_0`, run locally; Apache-2.0); Codex then reviewed those lines and
+corrected 1,174 of them, and Claude checked the result and removed empty, broken and untranslated lines. Grand Theft Auto is a trademark of Take-Two Interactive Software, Inc.
+
 The Death Stranding Director's Cut pack (`death-stranding-directors-cut.json.gz`) was translated with Claude (Claude ile
 çevrildi) from the fan-made English transcript at
 [Game Scripts Wiki](https://game-scripts-wiki.blogspot.com/2019/12/death-stranding-full-transcript.html); its terms

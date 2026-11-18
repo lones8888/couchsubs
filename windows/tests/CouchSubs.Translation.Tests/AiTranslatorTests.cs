@@ -1016,6 +1016,38 @@ public class AiTranslatorTests
         Assert.Equal(8, local.Calls.Count);
     }
 
+    /// <summary>Yerel modelde hata sonrası bekleme kısadır: beklerken satır yedeğe düşer, bekleme bitince model yeniden denenir.</summary>
+    [Fact]
+    public async Task LocalPausesBrieflyAfterError()
+    {
+        var down = true;
+        var fake = new FakeAi((request, body) => down ? throw new HttpRequestException("kapalı") : Echo(request, body));
+        var local = new FakeLocal();
+        var translator = new AiTranslator(AiProvider.Local, "", "qwen2.5:7b", local, new HttpClient(fake), budget: new RequestBudget(1000),
+                                          server: LocalAiServer.Create(LocalAiServer.OllamaUrl, "qwen2.5:7b"))
+        { ErrorPause = TimeSpan.FromMilliseconds(200) };
+        Assert.Equal("yerel: Run!", await translator.TranslateAsync("Run!"));
+        down = false;
+        Assert.Equal("yerel: Hide!", await translator.TranslateAsync("Hide!"));
+        Assert.Single(fake.Requests);
+        await Task.Delay(300);
+        Assert.Equal("[tr] Go!", await translator.TranslateAsync("Go!"));
+        Assert.Equal(2, fake.Requests.Count);
+        Assert.Equal(["Run!", "Hide!"], local.Calls);
+    }
+
+    /// <summary>Hata sonrası bekleme: yerel modelde birkaç saniye, bulut hizmetlerinde (kota) bir dakika.</summary>
+    [Fact]
+    public void ErrorPauseIsShortOnlyForLocalModel()
+    {
+        var local = new AiTranslator(AiProvider.Local, "", "qwen2.5:7b", new FakeLocal(), new HttpClient(new FakeAi(Echo)),
+                                     server: LocalAiServer.Create(LocalAiServer.OllamaUrl, "qwen2.5:7b"));
+        Assert.Equal(AiTranslator.LocalRetryAfter, local.ErrorPause);
+        Assert.True(AiTranslator.LocalRetryAfter <= TimeSpan.FromSeconds(10));
+        var cloud = new AiTranslator(AiProvider.Gemini, "anahtar", null, new FakeLocal(), new HttpClient(new FakeAi(Echo)));
+        Assert.Equal(TimeSpan.FromMinutes(1), cloud.ErrorPause);
+    }
+
     [Fact]
     public async Task TimeoutFallsBack()
     {

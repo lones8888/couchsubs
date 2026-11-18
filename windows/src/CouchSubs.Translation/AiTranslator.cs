@@ -424,8 +424,16 @@ public sealed class AiTranslator : ITextTranslator, IOnlineTranslator
 {
     /// <summary>Bağlama giden önceki satır sayısı.</summary>
     internal const int ContextLines = 3;
-    /// <summary>Hata sonrası bu süre hizmet denenmez.</summary>
+    /// <summary>Hata sonrası bu süre hizmet denenmez (bulut hizmetlerinin kotası için).</summary>
     private static readonly TimeSpan RetryAfter = TimeSpan.FromMinutes(1);
+    /// <summary>
+    /// Yerel modelde hata sonrası bekleme. Kota yoktur, sunucu çoğunlukla hemen düzelir (zaman aşımı, bozuk JSON, an
+    /// meşgul): tek bir hata bir dakika boyunca bütün satırları yedek çeviriye düşürmesin, yalnız birkaç satırı etkilesin.
+    /// Askıda kalan sunucuda da bekleme sürer: her satır <see cref="LocalTimeout"/> kadar beklemez, sıra dolmaz.
+    /// </summary>
+    internal static readonly TimeSpan LocalRetryAfter = TimeSpan.FromSeconds(5);
+    /// <summary>Hata sonrası hizmetin denenmediği süre: yerel modelde <see cref="LocalRetryAfter"/>, bulutta bir dakika (testler kısaltır).</summary>
+    internal TimeSpan ErrorPause { get; init; }
     /// <summary>Dakikalık sınır aşılınca en çok bu kadar beklenir (hizmet bekleme önermezse de bu kadar).</summary>
     public static readonly TimeSpan RateLimitPause = TimeSpan.FromSeconds(20);
     /// <summary>Denemede çevrilen örnek satır.</summary>
@@ -498,6 +506,7 @@ public sealed class AiTranslator : ITextTranslator, IOnlineTranslator
         _instruction = AiRequest.Instruction(instruction);
         _instructionTag = AiRequest.InstructionTag(_instruction);
         Provider = provider;
+        ErrorPause = provider.IsLocal() ? LocalRetryAfter : RetryAfter;
         Model = provider.Model(model);
         Server = provider.IsLocal() ? server ?? LocalAiServer.Create(LocalAiServer.OllamaUrl, Model.Id) : null;
         _key = key.Trim();
@@ -592,7 +601,7 @@ public sealed class AiTranslator : ITextTranslator, IOnlineTranslator
                                       && !cancellationToken.IsCancellationRequested)
         {
             Report(StateOf(error));
-            _pausedUntil = DateTimeOffset.UtcNow + RetryAfter;
+            _pausedUntil = DateTimeOffset.UtcNow + ErrorPause;
             _pauseRateLimited = false;
             return Remember(await FallbackAsync(text, cancellationToken).ConfigureAwait(false), text, game);
         }
@@ -697,7 +706,7 @@ public sealed class AiTranslator : ITextTranslator, IOnlineTranslator
                                           && !cancellationToken.IsCancellationRequested)
             {
                 Report(StateOf(error));
-                _pausedUntil = DateTimeOffset.UtcNow + RetryAfter;
+                _pausedUntil = DateTimeOffset.UtcNow + ErrorPause;
                 _pauseRateLimited = false;
                 failed = true;
             }

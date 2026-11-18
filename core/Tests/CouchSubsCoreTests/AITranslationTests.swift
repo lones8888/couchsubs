@@ -905,6 +905,34 @@ final class AITranslationTests: XCTestCase {
         }
     }
 
+    /// Yerel modelde hata sonrası bekleme kısadır: beklerken satır yerel çeviriye düşer, bekleme bitince model yeniden denenir.
+    func testLocalModelPausesBrieflyAfterError() async throws {
+        FakeAI.failure = (503, "{}")
+        let translator = makeLocal()
+        translator.errorPause = 0.2
+        var calls: [String] = []
+        let fallback: (String) async throws -> String = { calls.append($0); return "yerel: " + $0 }
+        let first = try await translator.translate("Run!", fallback: fallback)
+        XCTAssertEqual(first, "yerel: Run!")
+        FakeAI.failure = nil
+        let second = try await translator.translate("Hide!", fallback: fallback)
+        XCTAssertEqual(second, "yerel: Hide!")
+        XCTAssertEqual(FakeAI.requests.count, 1)
+        try await Task.sleep(nanoseconds: 300_000_000)
+        let third = try await translator.translate("Go!", fallback: fallback)
+        XCTAssertEqual(third, "[tr] Go!")
+        XCTAssertEqual(FakeAI.requests.count, 2)
+        XCTAssertEqual(calls, ["Run!", "Hide!"])
+    }
+
+    /// Hata sonrası bekleme: yerel modelde birkaç saniye, bulut hizmetlerinde (kota) bir dakika.
+    func testErrorPauseIsShortOnlyForLocalModel() {
+        XCTAssertEqual(makeLocal().errorPause, AITranslationCore.localRetryAfter)
+        XCTAssertLessThanOrEqual(AITranslationCore.localRetryAfter, 10)
+        XCTAssertEqual(make(.gemini).errorPause, 60)
+        XCTAssertEqual(AITranslationCore.retryAfter, 60)
+    }
+
     func testTimeoutFallsBack() async throws {
         FakeAI.timeout = true
         let translator = make(.claude)

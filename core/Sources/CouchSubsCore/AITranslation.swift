@@ -564,17 +564,24 @@ public enum AIRequest {
 
 /// Yapay zekâ çevirisinin ortak çekirdeği: önbellek, bağlam, cümle bölme, hata sonrası bekleme ve yerel çeviriye düşme.
 /// Uygulamadaki `AITranslator` bunu çeviri protokolüne bağlar. Hata olursa o satır yerel (ücretsiz) motorla çevrilir ve
-/// bir dakika hizmet denenmez; her satırda zaman aşımı beklenmez. Yerel çeviriler bu motorun önbelleğine yazılmaz.
+/// bir dakika (yerel modelde 5 sn) hizmet denenmez; her satırda zaman aşımı beklenmez. Yerel çeviriler bu motorun
+/// önbelleğine yazılmaz.
 /// Bir altyazının çevrilmemiş bütün cümleleri tek istekte gider. Ücretsiz katmanın dakikalık sınırı için model listesindeki
 /// `requestsPerMinute` kadar istek hakkı vardır; hak bitince o satır sessizce (hata göstermeden) yerel çeviriyle çevrilir.
 public final class AITranslationCore: @unchecked Sendable {
     /// Bağlama giden önceki satır sayısı.
     public static let contextLines = 3
-    /// Hata sonrası bu süre hizmet denenmez.
+    /// Hata sonrası bu süre hizmet denenmez (bulut hizmetlerinin kotası için).
     public static let retryAfter: TimeInterval = 60
+    /// Yerel modelde hata sonrası bekleme. Kota yoktur, sunucu çoğunlukla hemen düzelir (zaman aşımı, bozuk JSON, an
+    /// meşgul): tek bir hata bir dakika boyunca bütün satırları yerel çeviriye düşürmesin, yalnız birkaç satırı etkilesin.
+    /// Askıda kalan sunucuda da bekleme sürer: her satır `localTimeout` kadar beklemez, sıra dolmaz.
+    public static let localRetryAfter: TimeInterval = 5
     /// Dakikalık sınır aşılınca en çok bu kadar beklenir (hizmet bekleme önermezse de bu kadar).
     public static let rateLimitPause: TimeInterval = 20
 
+    /// Hata sonrası hizmetin denenmediği süre: yerel modelde `localRetryAfter`, bulutta `retryAfter` (testler kısaltır).
+    var errorPause: TimeInterval
     public let provider: AIProvider
     public let model: AIModel
     /// Yerel modelin sunucusu; bulut hizmetlerinde nil.
@@ -620,6 +627,7 @@ public final class AITranslationCore: @unchecked Sendable {
                 cache: TranslationCache = TranslationCache(), budget: RequestBudget? = nil, game: (@Sendable () -> String?)? = nil,
                 instruction: String? = nil) {
         self.provider = provider
+        errorPause = provider.isLocal ? Self.localRetryAfter : Self.retryAfter
         self.game = game
         self.instruction = AIRequest.instruction(instruction)
         instructionTag = AIRequest.instructionTag(instruction)
@@ -710,7 +718,7 @@ public final class AITranslationCore: @unchecked Sendable {
         } catch {
             setFailure(error as? AIFailure ?? .unreachable)
             lock.withLock {
-                pausedUntil = Date().addingTimeInterval(Self.retryAfter)
+                pausedUntil = Date().addingTimeInterval(errorPause)
                 pauseRateLimited = false
             }
             return remember(try await fallback(text), for: text, game: game)
@@ -807,7 +815,7 @@ public final class AITranslationCore: @unchecked Sendable {
             } catch {
                 setFailure(error as? AIFailure ?? .unreachable)
                 lock.withLock {
-                    pausedUntil = Date().addingTimeInterval(Self.retryAfter)
+                    pausedUntil = Date().addingTimeInterval(errorPause)
                     pauseRateLimited = false
                 }
                 failed = true

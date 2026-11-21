@@ -1,6 +1,6 @@
-# GTA 6 havuz eklenmesi, düzeltilmesi ve kod düzeltmeleri (42.147 satır)
+# GTA 6 havuz eklenmesi, düzeltilmesi ve kod düzeltmeleri (42.149 satır)
 
-Dosya: `gta-tr-havuz-katki.json.gz` · biçim 2 · 42.147 satır + 17.004 cümle parçası + bulanık imza (kısa satırlar dahil).
+Dosya: `gta-tr-havuz-katki.json.gz` · biçim 2 · 42.149 satır + 17.004 cümle parçası + bulanık imza (kısa satırlar dahil).
 
 Satır sayısı: #505'te gönderilen 24.452 satır → bu PR 39.186 satır (+14.734).
 
@@ -125,6 +125,8 @@ Testler (en son main üstünde): Core 1.143/1.143, Shell 396/396, Translation 21
   İngilizcede "nigga/niggas" olan 30 satırdaki "zenci" bağlama göre "kanka / lan / herif / herifler" oldu (küfür
   olduğu gibi kaldı). Okuma çöpü 1.265 satır çıktı: yalnız ekran/menü/tabela yazısı olanlar, temiz hâli havuzda zaten
   bulunan çöplü okumalar, İngilizce-Türkçe karışık yarım satırlar ("I the tea", "Sakla the r") ve `**` işaretli satır.
+- **21 Kas (balık ipucu):** önceki 42.147 satır → yeni 42.149 satır. Balık tutarken çıkan ipucunun temizlikte silinen
+  2 satırı geri eklendi (ortadaki kumanda simgesini OCR her seferinde farklı okuyor; bu 2 satır okumaların çoğunu karşılıyor).
 
 ## Devamı
 

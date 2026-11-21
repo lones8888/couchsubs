@@ -592,6 +592,7 @@ final class AppModel: ObservableObject {
             if settings.dubbing != oldValue.dubbing { dubbingSettingsChanged(from: oldValue.dubbing) }
             if settings.gamePacks != oldValue.gamePacks, let pipeline { connectPacks(to: pipeline) }
             pipeline?.showSpeakerNames = settings.showSpeakerNames
+            pipeline?.engineMark = engineMark(for: settings)
             server.speakerColors = settings.speakerColors
             if settings.setTextApart != oldValue.setTextApart {
                 server.setApart = settings.setTextApart
@@ -2433,6 +2434,7 @@ final class AppModel: ObservableObject {
                                         translator: makeTranslator(),
                                         server: server, scheduler: scheduler)
         pipeline.showSpeakerNames = settings.showSpeakerNames
+        pipeline.engineMark = engineMark(for: settings)
         pipeline.applyWaits(from: settings)
         pipeline.echo = .shared
         // Görev satırı altyazıya girmez; otomatik ekran yazısı açıksa "auto-mission" ek alanı olarak kendi yerinde ve özgün
@@ -2557,6 +2559,15 @@ final class AppModel: ObservableObject {
         let directory = base.appendingPathComponent(AppIdentity.name, isDirectory: true)
             .appendingPathComponent("Translations", isDirectory: true)
         return TranslationCache.shared(in: directory, engine: engine, source: source, target: target)
+    }
+
+    /// "Yerel modelin çevirdiği satırların başına nokta koy" açık ve çeviriyi yerel model yapıyorsa paketten gelmeyen satırın
+    /// başına konan işaret (sunucuya ulaşılamayınca devreye giren ücretsiz çeviri de motor satırıdır); deneme modunda yok
+    /// (Windows ile aynı).
+    func engineMark(for settings: UserSettings) -> String? {
+        let local = settings.onlineTranslation && settings.sourceLanguage == "en" && settings.targetLanguage == "tr"
+            && settings.onlineEngine == .local && settings.localAIServer != nil
+        return settings.markLocalAILines && !demoMode && local ? SubtitlePipeline.localAIMark : nil
     }
 
     /// Çevrimiçi çeviri yalnız İngilizce→Türkçe için ve seçili motor hazırsa açılır.

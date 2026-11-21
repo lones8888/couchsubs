@@ -218,6 +218,8 @@ private struct AppearanceCard: View {
             if model.settings.output.showsOnComputer {
                 HintText(text: "On the computer screen, move and resize the subtitle with the mouse: press Position the subtitles.")
                 Button("Position the subtitles") { model.overlayAdjusting = true }.buttonStyle(.secondary)
+                Toggle("Match the text size to the game subtitles", isOn: $model.settings.style.autoTextSize)
+                HintText(text: "Only in the subtitle window on this computer: the text takes the size of the subtitles in the game. The size above is used until a subtitle is read and is kept within 70–150% of it.")
             }
             Slider(value: Binding(get: { Double(model.settings.style.background) },
                                   set: { model.settings.style.background = Int($0.rounded()) }), in: 0...100) {

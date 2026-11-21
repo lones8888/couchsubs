@@ -814,6 +814,8 @@ final class AppModel: ObservableObject {
     /// örter (bkz. OverlayCover). Yeri gelmeyen satır son bilinen yeri kullanır; "Örtsün"de boy kararlıdır (CoverFontScale).
     var overlayCover: (text: String, box: TextBox?, scale: Double)?
     var overlayCoverFont = CoverFontScale()
+    /// Son 9 altyazı kutusunun yüksekliği (kareye oranla): "Yazı boyu oyundaki altyazı kadar" bunların ortancasını kullanır.
+    var overlayBoxHeights: [Double] = []
     /// "Yayın penceresi" açık: altyazı bilgisayar ekranında gösterilmese de satırlar yığına gelir (bkz. StreamWindow.swift).
     @Published var streamWindowOpen = false {
         didSet {

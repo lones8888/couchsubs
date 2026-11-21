@@ -74,6 +74,10 @@
                                 <TextBlock Style="{StaticResource HintText}" TextWrapping="Wrap"
                                            Text="{t:T 'On the computer screen, move and resize the subtitle with the mouse: press Position the subtitles.'}" />
                                 <Button HorizontalAlignment="Left" Margin="0,8,0,0" Content="{t:T 'Position the subtitles'}" Click="OnAdjustOverlay" />
+                                <CheckBox x:Name="AutoTextSize" Content="{t:T 'Match the text size to the game subtitles'}" Margin="0,12,0,0"
+                                          Checked="OnAutoTextSize" Unchecked="OnAutoTextSize" />
+                                <TextBlock Style="{StaticResource HintText}" TextWrapping="Wrap" Margin="0,4,0,0"
+                                           Text="{t:T 'Only in the subtitle window on this computer: the text takes the size of the subtitles in the game. The size above is used until a subtitle is read and is kept within 70–150% of it.'}" />
                             </StackPanel>
                             <TextBlock Text="{t:T 'Background'}" Margin="0,0,0,8" />
                             <Grid Margin="0,0,0,12">
